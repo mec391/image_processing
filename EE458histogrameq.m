@@ -1,18 +1,25 @@
+%Matthew Capuano
+%EE 458 Lab 2 - Image Equalization
+%For whatever reason, when mapping values from about 125 - 255, everything
+%gets pushed to max value and I cannot figure out why..
+
 close all
 clear all
 
 
-I = imread('low_contrast_bear.jpg');
+I = imread('bear.jpg');
 P = I;
 
 
 
-%process(do 3 times for R G and B):
+
+
+%process(do 3 times: for R G and B):
 
 %H Process 
 %Find number of pixels that exist for each value of 0 - 255
 % Normalize (x / 76800)
-%add prev value and mult by 7
+%add prev value and mult by 255
 
 %S Process
 % Use example from class but scaled to 256 bits
@@ -63,8 +70,8 @@ end
 
 %S Process
 S_array = zeros(256,1);
-
 %{
+sum = 0;
 for i = 1:1:128
     S_array(i) = 100 + sum;
     sum = sum + 2;
@@ -77,8 +84,8 @@ end
 %}
 
 
-for i = 1:1:256
-    S_array(i) = 300;
+for i = 1:1:256 % I want an even distribution of pixels for each value from 0 - 255 (76800 pixels / 256) = 300
+    S_array(i) = 300; % 300 pixels per color value (0-256)
 end
 
 
@@ -112,17 +119,17 @@ M_array = zeros(256,1);
 
 
 for i = 1:1:256
-    if H_array(i) == 0
+    if H_array(i) == 0 %No zeros in S array so map to 1
         M_array(i) = 1;
     else if H_array(i) == S_array(i)
-        M_array(i) = Zero_array(i);
+        M_array(i) = Zero_array(i); % 
         else 
         for j = 2:1:256
-            if S_array(j) ~= S_array(j-1)
+          if S_array(j) ~= S_array(j-1)
             if H_array (i) == S_array(j)
                M_array(i) = Zero_array(j);
             end
-            end
+           end
         end
         end
         if M_array(i) == 0
@@ -133,16 +140,18 @@ for i = 1:1:256
     end
 
 
-%Map the Red values
-for k = 0:1:255
+%Map the Red values  
+for k = 0:1:125 % I stop at 125 because everyhting gets mapped to max value after this
 for i = 1:1:240
     for j = 1:1:320
         if I(i,j,1) == k
-            I(i,j,1) = M_array(k + 1);
+            I(i,j,1) = M_array(k+1); 
         end
     end
 end
 end
+
+
 
 
 %Repeat for Green
@@ -250,9 +259,9 @@ for i = 1:1:256
         end
     end
 
-
+ 
 %Map the Red values
-for k = 0:1:255
+for k = 0:1:125 % I stop at 125 because everyhting gets mapped to max value after this
 for i = 1:1:240
     for j = 1:1:320
         if I(i,j,2) == k
@@ -363,15 +372,17 @@ for i = 1:1:256
         end
         end
         if M_array(i) == 0
-            M_array(i) = M_array(i - 1);
+           M_array(i) = M_array(i - 1);
         end
         
         end
-    end
+       
+end
+  
 
 
 %Map the Red values
-for k = 0:1:255
+for k = 0:1:125 % I stop at 125 because everyhting gets mapped to max value after this
 for i = 1:1:240
     for j = 1:1:320
         if I(i,j,3) == k
@@ -382,14 +393,15 @@ end
 end
 
 
+%}
 
 figure(1);
 imhist(P,256);
-imhist(I, 256);
+title('Histogram of Original Image');
 
 figure(2);
 imshowpair(P,I,'montage')
-title('My image equalized')
+title('Orignal Image Vs. My Image Equalized')
 set(gca,'fontsize',14);
 axis off
 
@@ -397,7 +409,11 @@ axis off
 Z = histeq(P);
 figure(3)
 imshow(Z);
+title('Matlab Image Equalization');
 figure(4)
 imhist(Z,256);
-
+title('Matlab Image Equalization');
+figure(5)
+imhist(I, 256);
+title('My Image Equalization Histogram');
 
